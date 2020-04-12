@@ -1,0 +1,12 @@
+spring:
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+  datasource: 
+    url: jdbc:h2:./h2db/db
+application:
+  bot-name: attendance-bot
+  come-phrase: 出勤
+  leave-phrase: 退勤
+  come-response-message: おはようございます。
+  leave-response-message: 'お疲れ様でした。(勤務時間: %s - %s)'
+  datetime-format: MM月dd日HH:mm
