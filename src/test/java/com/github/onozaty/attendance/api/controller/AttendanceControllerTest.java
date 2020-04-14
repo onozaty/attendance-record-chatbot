@@ -17,7 +17,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.github.onozaty.attendance.api.controller.RecodingController.Response;
 import com.github.onozaty.attendance.domain.entity.AttendanceEntity;
 import com.github.onozaty.attendance.domain.entity.AttendanceEntity.AttendanceType;
 import com.github.onozaty.attendance.domain.repository.AttendanceRepository;
@@ -27,7 +26,7 @@ import com.github.onozaty.attendance.domain.service.Message;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension.class)
 @Sql(statements = "TRUNCATE TABLE attendances")
-class RecodingControllerTest {
+class AttendanceControllerTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -47,14 +46,14 @@ class RecodingControllerTest {
                 .text("@attendance-bot 出勤")
                 .build();
 
-        ResponseEntity<Response> response = restTemplate.postForEntity(
-                "/api/recoding",
+        ResponseEntity<RecordingResponse> response = restTemplate.postForEntity(
+                "/api/attendance/recoding",
                 message,
-                Response.class);
+                RecordingResponse.class);
 
         assertThat(response)
                 .returns(HttpStatus.OK, ResponseEntity::getStatusCode)
-                .returns(new Response("@user1 おはようございます。"), ResponseEntity::getBody);
+                .returns(new RecordingResponse("@user1 おはようございます。"), ResponseEntity::getBody);
 
         assertThat(attendanceRepository.findAll())
                 .hasSize(1)
@@ -76,14 +75,14 @@ class RecodingControllerTest {
                 .text("@attendance-bot 退勤")
                 .build();
 
-        ResponseEntity<Response> response = restTemplate.postForEntity(
-                "/api/recoding",
+        ResponseEntity<RecordingResponse> response = restTemplate.postForEntity(
+                "/api/attendance/recoding",
                 message,
-                Response.class);
+                RecordingResponse.class);
 
         assertThat(response)
                 .returns(HttpStatus.OK, ResponseEntity::getStatusCode)
-                .returns(new Response("@user1 お疲れ様でした。(勤務時間:  - 04月12日12:23)"), ResponseEntity::getBody);
+                .returns(new RecordingResponse("@user1 お疲れ様でした。(勤務時間:  - 04月12日12:23)"), ResponseEntity::getBody);
 
         assertThat(attendanceRepository.findAll())
                 .hasSize(1)
@@ -115,20 +114,70 @@ class RecodingControllerTest {
                 .build();
 
         restTemplate.postForEntity(
-                "/api/recoding",
+                "/api/attendance/recoding",
                 comeMessage,
-                Response.class);
+                RecordingResponse.class);
 
-        ResponseEntity<Response> response = restTemplate.postForEntity(
-                "/api/recoding",
+        ResponseEntity<RecordingResponse> response = restTemplate.postForEntity(
+                "/api/attendance/recoding",
                 leaveMessage,
-                Response.class);
+                RecordingResponse.class);
 
         assertThat(response).returns(HttpStatus.OK, ResponseEntity::getStatusCode)
-                .returns(new Response("@user1 お疲れ様でした。(勤務時間: 04月12日09:15 - 04月12日18:30)"), ResponseEntity::getBody);
+                .returns(new RecordingResponse("@user1 お疲れ様でした。(勤務時間: 04月12日09:15 - 04月12日18:30)"),
+                        ResponseEntity::getBody);
 
         assertThat(attendanceRepository.findAll())
                 .hasSize(2);
     }
 
+    @Test
+    void recoding_宛先の指定なし() {
+
+        Message message = Message.builder()
+                .userName("user1")
+                .timestamp(
+                        LocalDateTime.parse("2020-04-12T12:23:01")
+                                .atZone(ZoneId.systemDefault())
+                                .toOffsetDateTime())
+                .text("出勤")
+                .build();
+
+        ResponseEntity<RecordingResponse> response = restTemplate.postForEntity(
+                "/api/attendance/recoding",
+                message,
+                RecordingResponse.class);
+
+        assertThat(response)
+                .returns(HttpStatus.OK, ResponseEntity::getStatusCode)
+                .returns(null, ResponseEntity::getBody);
+
+        assertThat(attendanceRepository.findAll())
+                .isEmpty();
+    }
+
+    @Test
+    void recoding_フレーズに不一致() {
+
+        Message message = Message.builder()
+                .userName("user1")
+                .timestamp(
+                        LocalDateTime.parse("2020-04-12T12:23:01")
+                                .atZone(ZoneId.systemDefault())
+                                .toOffsetDateTime())
+                .text("@attendance-bot 出")
+                .build();
+
+        ResponseEntity<RecordingResponse> response = restTemplate.postForEntity(
+                "/api/attendance/recoding",
+                message,
+                RecordingResponse.class);
+
+        assertThat(response)
+                .returns(HttpStatus.OK, ResponseEntity::getStatusCode)
+                .returns(null, ResponseEntity::getBody);
+
+        assertThat(attendanceRepository.findAll())
+                .isEmpty();
+    }
 }
