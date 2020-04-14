@@ -2,8 +2,10 @@ package com.github.onozaty.attendance.domain.service;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -23,6 +25,8 @@ import lombok.RequiredArgsConstructor;
 public class AttendanceService {
 
     private final AttendanceRepository attendanceRepository;
+
+    private final DayAttendancesBuilder dayAttendancesBuilder;
 
     @Value("${application.bot-name}")
     private String botName;
@@ -55,12 +59,17 @@ public class AttendanceService {
                                 .date(localDateTime.toLocalDate())
                                 .time(localDateTime.toLocalTime())
                                 .build()))
-                .map(this::createResponse);
+                .map(this::createRecodingResponse);
+    }
+
+    public List<DayAttendance> getDayAttendances(YearMonth month) {
+
+        return dayAttendancesBuilder.build(month);
     }
 
     private Optional<AttendanceType> judgeType(Message message) {
 
-        // Bot宛ての発言のみが対象
+        // bot宛ての発言のみが対象
         if (!message.getText().contains("@" + botName)) {
             return Optional.empty();
         }
@@ -76,7 +85,7 @@ public class AttendanceService {
         return Optional.empty();
     }
 
-    private String createResponse(AttendanceEntity currentAttendanceEntity) {
+    private String createRecodingResponse(AttendanceEntity currentAttendanceEntity) {
 
         StringBuilder response = new StringBuilder()
                 .append("@").append(currentAttendanceEntity.getUserName())
