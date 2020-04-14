@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>attendance-record-chatbot</name>
-	<comment>Project attendance-record-chatbot created by Buildship.</comment>
+	<name>attendance-recorder</name>
+	<comment>Project attendance-recorder created by Buildship.</comment>
 	<projects>
 	</projects>
 	<buildSpec>
