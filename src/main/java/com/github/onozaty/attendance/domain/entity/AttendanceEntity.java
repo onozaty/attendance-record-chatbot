@@ -1,6 +1,7 @@
 package com.github.onozaty.attendance.domain.entity;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -32,7 +33,9 @@ public class AttendanceEntity {
     @Enumerated(EnumType.STRING)
     private AttendanceType type;
 
-    private OffsetDateTime dateTime;
+    private LocalDate date;
+
+    private LocalTime time;
 
     public enum AttendanceType {
         COME, LEAVE

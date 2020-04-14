@@ -9,4 +9,3 @@ application:
   leave-phrase: 退勤
   come-response-message: おはようございます。
   leave-response-message: 'お疲れ様でした。(勤務時間: %s - %s)'
-  datetime-format: MM月dd日HH:mm

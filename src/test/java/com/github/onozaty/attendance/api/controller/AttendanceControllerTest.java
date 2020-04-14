@@ -2,7 +2,9 @@ package com.github.onozaty.attendance.api.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 
 import org.junit.jupiter.api.Test;
@@ -59,7 +61,8 @@ class AttendanceControllerTest {
                 .hasSize(1)
                 .first()
                 .returns(message.getUserName(), AttendanceEntity::getUserName)
-                .returns(message.getTimestamp(), AttendanceEntity::getDateTime)
+                .returns(LocalDate.of(2020, 4, 12), AttendanceEntity::getDate)
+                .returns(LocalTime.of(12, 23, 1), AttendanceEntity::getTime)
                 .returns(AttendanceType.COME, AttendanceEntity::getType);
     }
 
@@ -82,13 +85,14 @@ class AttendanceControllerTest {
 
         assertThat(response)
                 .returns(HttpStatus.OK, ResponseEntity::getStatusCode)
-                .returns(new RecordingResponse("@user1 お疲れ様でした。(勤務時間:  - 04月12日12:23)"), ResponseEntity::getBody);
+                .returns(new RecordingResponse("@user1 お疲れ様でした。(勤務時間:  - 12:23)"), ResponseEntity::getBody);
 
         assertThat(attendanceRepository.findAll())
                 .hasSize(1)
                 .first()
                 .returns(message.getUserName(), AttendanceEntity::getUserName)
-                .returns(message.getTimestamp(), AttendanceEntity::getDateTime)
+                .returns(LocalDate.of(2020, 4, 12), AttendanceEntity::getDate)
+                .returns(LocalTime.of(12, 23, 1), AttendanceEntity::getTime)
                 .returns(AttendanceType.LEAVE, AttendanceEntity::getType);
     }
 
@@ -124,7 +128,47 @@ class AttendanceControllerTest {
                 RecordingResponse.class);
 
         assertThat(response).returns(HttpStatus.OK, ResponseEntity::getStatusCode)
-                .returns(new RecordingResponse("@user1 お疲れ様でした。(勤務時間: 04月12日09:15 - 04月12日18:30)"),
+                .returns(new RecordingResponse("@user1 お疲れ様でした。(勤務時間: 09:15 - 18:30)"),
+                        ResponseEntity::getBody);
+
+        assertThat(attendanceRepository.findAll())
+                .hasSize(2);
+    }
+
+    @Test
+    void recoding_退勤_出勤が前日() {
+
+        Message comeMessage = Message.builder()
+                .userName("user1")
+                .timestamp(
+                        LocalDateTime.parse("2020-04-11T09:15:15")
+                                .atZone(ZoneId.systemDefault())
+                                .toOffsetDateTime())
+                .text("@attendance-bot 出勤")
+                .build();
+
+        Message leaveMessage = Message.builder()
+                .userName("user1")
+                .timestamp(
+                        LocalDateTime.parse("2020-04-12T18:30:01")
+                                .atZone(ZoneId.systemDefault())
+                                .toOffsetDateTime())
+                .text("@attendance-bot 退勤")
+                .build();
+
+        restTemplate.postForEntity(
+                "/api/attendance/recoding",
+                comeMessage,
+                RecordingResponse.class);
+
+        ResponseEntity<RecordingResponse> response = restTemplate.postForEntity(
+                "/api/attendance/recoding",
+                leaveMessage,
+                RecordingResponse.class);
+
+        // 出勤が前日なので、出勤時間なし
+        assertThat(response).returns(HttpStatus.OK, ResponseEntity::getStatusCode)
+                .returns(new RecordingResponse("@user1 お疲れ様でした。(勤務時間:  - 18:30)"),
                         ResponseEntity::getBody);
 
         assertThat(attendanceRepository.findAll())

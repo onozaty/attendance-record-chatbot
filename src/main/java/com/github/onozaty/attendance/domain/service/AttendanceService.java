@@ -1,5 +1,7 @@
 package com.github.onozaty.attendance.domain.service;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -37,19 +39,21 @@ public class AttendanceService {
     @Value("${application.leave-response-message}")
     private String leaveResponseMessage;
 
-    @Value("${application.datetime-format}")
-    private String dateTimeFormat;
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     public Optional<String> recoding(Message message) {
 
         Optional<AttendanceType> type = judgeType(message);
+
+        LocalDateTime localDateTime = toLocalDateTime(message.getTimestamp());
 
         return type
                 .map(x -> attendanceRepository.save(
                         AttendanceEntity.builder()
                                 .userName(message.getUserName())
                                 .type(x)
-                                .dateTime(message.getTimestamp())
+                                .date(localDateTime.toLocalDate())
+                                .time(localDateTime.toLocalTime())
                                 .build()))
                 .map(this::createResponse);
     }
@@ -81,18 +85,22 @@ public class AttendanceService {
         switch (currentAttendanceEntity.getType()) {
 
             case COME:
+
                 response.append(comeResponseMessage);
                 break;
+
             case LEAVE:
 
-                AttendanceEntity lastComeAttendanceEntity = attendanceRepository
-                        .findLastCome(currentAttendanceEntity.getUserName());
+                AttendanceEntity comeAttendanceEntity = attendanceRepository
+                        .findLastComeByUserNameAndDate(
+                                currentAttendanceEntity.getUserName(),
+                                currentAttendanceEntity.getDate());
 
                 response.append(
                         String.format(
                                 leaveResponseMessage,
-                                formatDateTime(lastComeAttendanceEntity),
-                                formatDateTime(currentAttendanceEntity)));
+                                formatTime(comeAttendanceEntity),
+                                formatTime(currentAttendanceEntity)));
                 break;
             default:
                 break;
@@ -101,14 +109,18 @@ public class AttendanceService {
         return response.toString();
     }
 
-    private String formatDateTime(AttendanceEntity attendanceEntity) {
+    private String formatTime(AttendanceEntity attendanceEntity) {
 
         if (attendanceEntity == null) {
             return "";
         }
 
-        return DateTimeFormatter.ofPattern(dateTimeFormat)
-                // システムのタイムゾーンに合わせてフォーマット
-                .format(attendanceEntity.getDateTime().atZoneSameInstant(ZoneId.systemDefault()));
+        return TIME_FORMATTER.format(attendanceEntity.getTime());
+    }
+
+    private LocalDateTime toLocalDateTime(OffsetDateTime offsetDateTime) {
+
+        // システムのタイムゾーンに合わせた日時に変換
+        return offsetDateTime.atZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
     }
 }
