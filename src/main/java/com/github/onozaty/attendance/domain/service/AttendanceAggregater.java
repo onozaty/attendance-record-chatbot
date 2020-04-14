@@ -14,18 +14,17 @@ import org.springframework.stereotype.Component;
 import com.github.onozaty.attendance.domain.entity.AttendanceEntity;
 import com.github.onozaty.attendance.domain.entity.AttendanceEntity.AttendanceType;
 import com.github.onozaty.attendance.domain.repository.AttendanceRepository;
-import com.github.onozaty.attendance.domain.service.DayAttendance.UserAttendance;
-import com.github.onozaty.attendance.domain.service.DayAttendance.UserAttendance.UserAttendanceBuilder;
+import com.github.onozaty.attendance.domain.service.UserAttendance.UserAttendanceBuilder;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-class DayAttendancesBuilder {
+class AttendanceAggregater {
 
     private final AttendanceRepository attendanceRepository;
 
-    public List<DayAttendance> build(YearMonth month) {
+    public List<DayAttendance> aggregate(YearMonth month) {
 
         LocalDate fromDate = month.atDay(1);
         LocalDate toDate = month.atEndOfMonth();
@@ -51,6 +50,13 @@ class DayAttendancesBuilder {
         return dayAttendances;
     }
 
+    public UserAttendance aggregate(String userName, LocalDate date) {
+
+        List<AttendanceEntity> attendanceEntities = attendanceRepository.findByUserNameAndDate(userName, date);
+
+        return createUserAttendance(userName, attendanceEntities);
+    }
+
     private DayAttendance createDayAttendance(LocalDate date, List<AttendanceEntity> attendanceEntities) {
 
         List<UserAttendance> userAttendances = attendanceEntities.stream()
@@ -62,7 +68,7 @@ class DayAttendancesBuilder {
                 .collect(Collectors.toList());
 
         return DayAttendance.builder()
-                .day(date)
+                .date(date)
                 .users(userAttendances)
                 .build();
     }

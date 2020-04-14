@@ -1,7 +1,6 @@
 package com.github.onozaty.attendance.domain.service;
 
-import java.time.LocalDate;
-import java.util.List;
+import java.time.LocalTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,9 +11,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class DayAttendance {
+public class UserAttendance {
 
-    private LocalDate date;
+    private String userName;
 
-    private List<UserAttendance> users;
+    private LocalTime comeTime;
+
+    private LocalTime leaveTime;
 }
