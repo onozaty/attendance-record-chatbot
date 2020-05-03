@@ -33,6 +33,23 @@ function addMonth(currentMonth, num) {
   return toMonthString(date);
 }
 
+function setChangeActiveEvent(tdElement, tdIndex) {
+
+  const colSelector = 'td:nth-child(' + tdIndex + ')';
+
+  tdElement.addEventListener('mouseover', () => {
+    document.querySelectorAll(colSelector).forEach((td) => {
+      td.classList.add('active');
+    });
+  });
+
+  tdElement.addEventListener('mouseleave', () => {
+    document.querySelectorAll(colSelector).forEach((td) => {
+      td.classList.remove('active');
+    });
+  });
+}
+
 function drawAttendances(currentMonth, attendances) {
 
   document.getElementById('currentMonth').textContent = currentMonth;
@@ -75,13 +92,19 @@ function drawAttendances(currentMonth, attendances) {
   attendances.forEach(dayAttendance => {
     const rowElement = bodyElement.appendChild(document.createElement('tr'));
 
+    let tdIndex = 0;
+
     const dateTdElement = rowElement.appendChild(document.createElement('td'))
     dateTdElement.className = 'date';
     dateTdElement.textContent = dayAttendance.date.slice(-2);
+    setChangeActiveEvent(dateTdElement, ++tdIndex);
 
     allUserNames.forEach(userName => {
       const userComeElement = rowElement.appendChild(document.createElement('td'));
+      setChangeActiveEvent(userComeElement, ++tdIndex);
+
       const userLeaveElement = rowElement.appendChild(document.createElement('td'));
+      setChangeActiveEvent(userLeaveElement, ++tdIndex);
 
       const user = dayAttendance.users.find(x => x.userName == userName);
       if (user) {
