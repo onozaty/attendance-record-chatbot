@@ -140,4 +140,25 @@ class AttendanceControllerTest {
                         new DayAttendance(LocalDate.of(2020, 4, 29), Collections.emptyList()),
                         new DayAttendance(LocalDate.of(2020, 4, 30), Collections.emptyList()));
     }
+
+    @Test
+    void record() {
+
+        ResponseEntity<AttendanceEntity> response = restTemplate.postForEntity(
+                "/api/attendances",
+                AttendanceRecordRequest.builder()
+                        .userName("test1")
+                        .type(AttendanceType.LEAVE)
+                        .build(),
+                AttendanceEntity.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        AttendanceEntity responceBody = response.getBody();
+        assertThat(responceBody.getId()).isNotNull();
+        assertThat(responceBody.getUserName()).isEqualTo("test1");
+        assertThat(responceBody.getType()).isEqualTo(AttendanceType.LEAVE);
+        assertThat(responceBody.getDate()).isBetween(LocalDate.now().minusDays(1), LocalDate.now()); // 日跨ぎを考慮
+        assertThat(responceBody.getTime()).isNotNull();
+    }
 }
