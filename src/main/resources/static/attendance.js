@@ -134,31 +134,136 @@ function load() {
     {
       "date":"2020-04-01",
       "users":[
-        {"userName":"user2","comeTime":"10:00:00","leaveTime":"18:00:00"}
+        {"userName":"user1","comeTime":"09:30:00","leaveTime":"18:00:00"},
+        {"userName":"user2","comeTime":"10:00:00","leaveTime":"18:00:00"},
+        {"userName":"user3","comeTime":"10:00:00","leaveTime":"19:00:00"}
       ]
     },
     {
       "date":"2020-04-02",
       "users":[
-        {"userName":"user1","comeTime":"09:30:30","leaveTime":"19:12:34"}
+        {"userName":"user1","comeTime":"09:30:30","leaveTime":"19:12:34"},
+        {"userName":"user2","comeTime":"13:12:00","leaveTime":"21:11:00"},
+        {"userName":"user3","comeTime":"10:00:00","leaveTime":"18:05:00"}
       ]
     },
     {
       "date":"2020-04-03",
-      "users":[]
+      "users":[
+        {"userName":"user1","comeTime":"09:25:30","leaveTime":"20:11:22"}
+      ]
     },
     {
       "date":"2020-04-04",
-      "users":[
-        {"userName":"user1","comeTime":null,"leaveTime":"15:00:00"},
-        {"userName":"user2","comeTime":"08:00:00","leaveTime":null}
-      ]
+      "users":[]
     },
     {
       "date":"2020-04-05",
+      "users":[]
+    },
+    {
+      "date":"2020-04-06",
       "users":[
-        {"userName":"user3","comeTime":"09:30:30","leaveTime":null}
+        {"userName":"user1","comeTime":"09:00:00","leaveTime":"15:00:00"},
+        {"userName":"user2","comeTime":"08:00:00","leaveTime":null},
+        {"userName":"user3","comeTime":"09:58:00","leaveTime":"18:30:00"}
       ]
+    },
+    {
+      "date":"2020-04-07",
+      "users":[]
+    },
+    {
+      "date":"2020-04-08",
+      "users":[]
+    },
+    {
+      "date":"2020-04-09",
+      "users":[]
+    },
+    {
+      "date":"2020-04-10",
+      "users":[]
+    },
+    {
+      "date":"2020-04-11",
+      "users":[]
+    },
+    {
+      "date":"2020-04-12",
+      "users":[]
+    },
+    {
+      "date":"2020-04-13",
+      "users":[]
+    },
+    {
+      "date":"2020-04-14",
+      "users":[]
+    },
+    {
+      "date":"2020-04-15",
+      "users":[]
+    },
+    {
+      "date":"2020-04-16",
+      "users":[]
+    },
+    {
+      "date":"2020-04-17",
+      "users":[]
+    },
+    {
+      "date":"2020-04-18",
+      "users":[]
+    },
+    {
+      "date":"2020-04-19",
+      "users":[]
+    },
+    {
+      "date":"2020-04-20",
+      "users":[]
+    },
+    {
+      "date":"2020-04-21",
+      "users":[]
+    },
+    {
+      "date":"2020-04-22",
+      "users":[]
+    },
+    {
+      "date":"2020-04-23",
+      "users":[]
+    },
+    {
+      "date":"2020-04-24",
+      "users":[]
+    },
+    {
+      "date":"2020-04-25",
+      "users":[]
+    },
+    {
+      "date":"2020-04-26",
+      "users":[]
+    },
+    {
+      "date":"2020-04-27",
+      "users":[]
+    },
+    {
+      "date":"2020-04-28",
+      "users":[]
+    },
+    {
+      "date":"2020-04-29",
+      "users":[]
+    },
+    {
+      "date":"2020-04-30",
+      "users":[]
     }
   ];
 
